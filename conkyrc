@@ -1,0 +1,111 @@
+background no
+use_xft yes
+xftfont 123:size=8
+xftalpha 1
+update_interval 2
+total_run_times 0
+own_window yes
+own_window_type normal
+own_window_transparent yes
+own_window_argb_visual yes
+own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
+double_buffer yes
+#default_bar_size 0 6
+ 
+maximum_width 296
+draw_shades no
+draw_outline no
+draw_borders yes
+draw_graph_borders no
+default_color white
+default_shade_color red
+default_outline_color green
+alignment top_right
+gap_x 40
+#gap_y 230
+gap_y 80
+no_buffers yes
+uppercase no
+cpu_avg_samples 5
+net_avg_samples 2
+override_utf8_locale yes
+use_spacer no
+ 
+TEXT
+
+${font Open Sans:size=20}${color dodgerblue3}Slackware${color}Linux 14.2$font$color
+# DATE AND TIME
+${color dodgerblue3}${font Open Sans:Bold:size=10}DATE ${hr 5}$color$font
+${font Open Sans:size=12}${time %A}, ${time %d %B %Y}, ${font OpenSans:Bold:size=12}${time %H:%M}$font$color
+
+# SYS
+${voffset -8}${font Open Sans:Bold:size=10}${color dodgerblue3}SYSTEM $color${font}
+$sysname $kernel $alignr $machine
+Uptime: $alignr $uptime
+Last System Update:$alignr${execi 60 stat /var/lib/slackpkg/pkglist | grep Modify | cut -d ' ' -f 2}
+
+
+# CPU
+${color dodgerblue3}${font Open Sans:Bold:size=10}CPU $font$color
+${exec ~/utils/__conky_cpu_model.sh}$alignr$cpu%
+Core 0  ${freq_g cpu0}GHz ${execi 2 ~/utils/__conky_cpu_temp.sh 0}°C ${alignc 60}${color dodgerblue3}${cpubar cpu0}${color}
+Core 1  ${freq_g cpu1}GHz ${execi 2 ~/utils/__conky_cpu_temp.sh 1}°C ${alignc 60}${color dodgerblue3}${cpubar cpu1}${color}
+Core 2  ${freq_g cpu2}GHz ${execi 2 ~/utils/__conky_cpu_temp.sh 2}°C ${alignc 60}${color dodgerblue3}${cpubar cpu2}${color}
+Core 3  ${freq_g cpu3}GHz ${execi 2 ~/utils/__conky_cpu_temp.sh 3}°C ${alignc 60}${color dodgerblue3}${cpubar cpu3}${color}
+# MEMORY
+${color dodgerblue3}${font Open Sans:Bold:size=10}MEMORY $color$font $memperc% ${membar 4}$color 
+Used $alignr$mem of $memmax
+Buffers/Cached/Free $alignr$buffers / $cached / $memeasyfree
+Swap $swapperc%$alignr $swap of $swapmax
+
+------------------------------------------------- ${font Open Sans:Bold:size=10}${color dodgerblue3}${voffset -2}CPU${color}${font}${voffset -1} ---- ${font Open Sans:Bold:size=10}${color dodgerblue3}${voffset -2}RAM${color}${font}${voffset -1} -
+#${hr 1}
+${top name 1}${alignr}${top cpu 1} % ${top mem 1} %
+${top name 2}${alignr}${top cpu 2} % ${top mem 2} %
+${top name 3}${alignr}${top cpu 3} % ${top mem 3} %
+${top name 4}${alignr}${top cpu 4} % ${top mem 4} %
+${top name 5}${alignr}${top cpu 5} % ${top mem 5} %
+#${top_mem name 1}${alignr}${top_mem cpu 1} % ${top_mem mem 1} %
+
+# NETWORK
+${voffset -8}${font Open Sans:Bold:size=10}${color dodgerblue3}NETWORK$color
+${font Open Sans:bold:size=8.5}External IP ${font}${alignr}${execi 60 ~/utils/__conky_external_ip.sh }$font
+${voffset -14}${alignc}ping: ${font Open Sans:bold:size=8.5}${execi 60 ~/utils/__conky_ping_time.sh}${color #66aaff}${font}${color} ms
+${font Open Sans:bold:size=8.5}Ethernet $font$alignr ${addr}
+↑ ${upspeedf} kb/s $alignr ${totalup}
+${voffset -14}$alignc${upspeedgraph 10,120  000000 aaddff}
+↓ ${downspeedf} kb/s $alignr ${totaldown}
+${voffset -14}$alignc${downspeedgraph 10,120  000000 66aaff}
+# WIFI
+#${voffset -10}${font Open Sans:bold:size=8.5}WiFi $font${wireless_bitrate wlan1} $alignr ${addr wlan1}
+#${voffset -14}$alignc${wireless_essid wlan1}
+#$alignc${wireless_link_bar 4,260 wlan1}   
+#↑ ${upspeedf wlan1} kb/s $alignr ${totalup wlan1}
+#${voffset -14}$alignc${upspeedgraph wlan1 10,120 000000 aaddff}
+#↓ ${downspeedf wlan1} kb/s $alignr ${totaldown wlan1}
+#${voffset -14}$alignc${downspeedgraph wlan1 10,120 000000 66aaff}
+
+# HDD
+${font Open Sans:Bold:size=10}${color dodgerblue3}DISCS $color
+${font Open Sans:bold:size=8.5}Root${font} (/dev/sda1)${alignc -20}${fs_used} / ${fs_size}$alignr ${fs_type}
+${fs_used_perc} % ${alignc -30} ${color aaddff}write: ${diskio_write /dev/sda}${color 66aaff} ${alignr 30} read:${diskio_read /dev/sda}$color 
+${fs_bar}
+$color${font Open Sans:bold:size=8.5}Home${font} (/dev/sdc1)${alignc -20}${fs_used /home} / ${fs_size /home}$alignr ${fs_type /home}
+${fs_used_perc /home} % ${alignc -30} ${color aaddff}write: ${diskio_write /dev/sdc}${color 66aaff}${alignr 30}read:${diskio_read /dev/sdc}$color 
+${fs_bar /home}
+
+# AUDIO
+${font Open Sans:Bold:size=10}${color dodgerblue3}AUDIO $color$font
+$alignc${font Open Sans:bold:size=8.5}OUTPUTS:${font}
+Master ${alignc 60}\
+${execbar amixer -c 0 get Master | grep Mono: | cut -d " " -f6 | grep -o "[0-9]*"}
+
+${font AvantGardeLTMedium:bold:size=10}${color Tan1}Now Playing ${color slate grey}${hr 2}${font}
+${color1}Artist                 ${alignr}${color}${execi 10 python ~/utils/__conky_amarok_now_playing.py -a}
+${color1}Title                  ${alignr}${color}${execi 10 python ~/utils/__conky_amarok_now_playing.py -t}
+${color1}Album                  ${alignr}${color}${execi 10 python ~/utils/__conky_amarok_now_playing.py -l}
+${color1}Year                   ${alignr}${color}${execi 10 python ~/utils/__conky_amarok_now_playing.py -y}
+${color1}Bitrate                ${alignr}${color}${execi 10 python ~/utils/__conky_amarok_now_playing.py -b}
+#${execi 20 python ~/utils/__conky_amarok_now_playing.py -c /tmp/cover.jpg}${image /tmp/cover.jpg -p 180,580}
+#${voffset 500}
+
