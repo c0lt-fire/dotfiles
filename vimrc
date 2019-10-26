@@ -12,11 +12,12 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 "Plugin 'python-mode/python-mode'
+"Plugin 'vimwiki/vimwiki'
+Plugin 'godlygeek/tabular'
+Plugin 'plasticboy/vim-markdown'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
-
-
 
 
 set tabstop=8
@@ -32,7 +33,8 @@ set smartcase
 set mouse=""
 set hidden
 set number
-set cursorline
+"set cursorline
+set nocursorline
 set termguicolors
 set history=300
 set cmdheight=2 "The commandbar height
@@ -41,7 +43,8 @@ set showcmd	" Show (partial) command in status line.
 set showmatch   " Show matching bracets when text indicator is over them
 set mat=2       " How many tenths of a second to blink
 set pumheight=5 " Limit popup menu height 
-set completeopt=menuone,longest
+"set completeopt=menuone,longest
+set nofoldenable
 
 "set autochdir	" automatically change window's cwd to file's dir
 set autoread 	" Set to auto read when a file is changed from the outside
@@ -103,9 +106,22 @@ let python_highlight_all=1
 let g:pymode_options_colorcolumn = 0
 let g:pymode_options_max_line_length = 120
 
+let g:vimwiki_list = [{'path': '~/igor/Dropbox/vimwiki',
+                     \'syntax': 'markdown', 'ext': '.md'}]
 
 
-colorscheme codeschool
+colorscheme desert
 filetype indent plugin on
 syntax enable
 
+if has("gui_running")
+    set lines=50 columns=120
+    set mouse=a
+    colorscheme morning
+    
+    "copy to system clipboard with y only
+    nnoremap y "+y
+    vnoremap y "+y
+
+    nnoremap <C-TAB> :b#<CR>
+endif

@@ -1,12 +1,14 @@
 
-export PATH="$PATH:/usr/local/sbin:/usr/sbin:/sbin:$HOME/bin"
+export PATH="$PATH:/usr/local/sbin:/usr/sbin:/sbin:$HOME/bin:$HOME/bin/photo"
 
-PS1='\[\033[1;32m\]\u\[\033[1;37m\]@\[\033[1;34m\]\h:\[\033[1;40m\]\w\$\[\033[0m\] ' 
+if [ $(id -u) -eq 0 ]; then
+    #root
+    PS1='\[\033[1;35m\]\u\[\033[1;37m\]@\[\033[1;31m\]\h:\[\033[1;40m\]\w\$\[\033[0m\] '
+else
+    PS1='\[\033[1;32m\]\u\[\033[1;37m\]@\[\033[1;31m\]\h:\[\033[1;40m\]\w\$\[\033[0m\] ' 
+fi
 
-export NON_LOCAL_LOGIN=`env | grep SSH`
-if [ "$NON_LOCAL_LOGIN" != "" ]; then
-       PS1="\033[33m[\u@\h:\w]#\033[0m "
-fi;
+EDITOR=vim
 
 # enable bash completion in interactive shells
 if [ -f /etc/profile.d/bash_completion.sh ] && ! shopt -oq posix; then
@@ -14,6 +16,7 @@ if [ -f /etc/profile.d/bash_completion.sh ] && ! shopt -oq posix; then
 fi
 
 
+# Define some useful aliases:
 alias ls="/bin/ls --color=auto --group-directories-first"
 alias ll='ls -l'
 alias la='ls -a'
@@ -23,6 +26,13 @@ alias lf='ls -Fax'
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
 alias grepit='egrep -v "^\s*(#|$)"'
+
+lsp() { basename $(ls -1 "/var/log/packages/$@"*) ; }
+alias md="mkdir"
+alias tarview="tar -tvf"
+
+PROMPT_COMMAND='echo -en "\033]0;$(whoami)@$(hostname|cut -d "." -f1):$(pwd|sed 's#/home/mago#~#')\a"'
+[[ -x /usr/games/fortune ]] && /usr/games/fortune
 
 
 
