@@ -13,6 +13,7 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 "Plugin 'python-mode/python-mode'
 "Plugin 'vimwiki/vimwiki'
+Plugin 'tpope/vim-unimpaired'
 Plugin 'godlygeek/tabular'
 Plugin 'plasticboy/vim-markdown'
 
@@ -45,6 +46,9 @@ set mat=2       " How many tenths of a second to blink
 set pumheight=5 " Limit popup menu height 
 "set completeopt=menuone,longest
 set nofoldenable
+set splitbelow
+set splitright
+set linebreak
 
 "set autochdir	" automatically change window's cwd to file's dir
 set autoread 	" Set to auto read when a file is changed from the outside
@@ -125,3 +129,19 @@ if has("gui_running")
 
     nnoremap <C-TAB> :b#<CR>
 endif
+
+
+"Functions
+
+inoremap <silent> <Bar>   <Bar><Esc>:call <SID>align()<CR>a
+
+function! s:align()
+  let p = '^\s*|\s.*\s|\s*$'
+  if exists(':Tabularize') && getline('.') =~# '^\s*|' && (getline(line('.')-1) =~# p || getline(line('.')+1) =~# p)
+    let column = strlen(substitute(getline('.')[0:col('.')],'[^|]','','g'))
+    let position = strlen(matchstr(getline('.')[0:col('.')],'.*|\s*\zs.*'))
+    Tabularize/|/l1
+    normal! 0
+    call search(repeat('[^|]*|',column).'\s\{-\}'.repeat('.',position),'ce',line('.'))
+  endif
+endfunction

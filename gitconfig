@@ -13,7 +13,8 @@
     d   = difftool --dir-diff           #diff between working directory and index (shows changes that are not staged yet)
     dc  = difftool --dir-diff --cached  #diff between index and HEAD (staged vs last commit)
     dh  = difftool --dir-diff HEAD      #diff between working directory and HEAD (all local changes)
-    lg  = log --graph --all --topo-order --decorate --oneline --boundary
+    lg  = log --pretty=format:'%C(yellow)%h %Cred%ad %Cblue%an%Cgreen%d %Creset%s' --date=short
+    st  = status
 [diff]
     tool = meld
 [difftool]
@@ -24,3 +25,4 @@
         tool = meld
 [mergetool "meld"]
         cmd = meld "$LOCAL" "$MERGED" "$REMOTE" --output "$MERGED"
+

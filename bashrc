@@ -32,7 +32,6 @@ alias md="mkdir"
 alias tarview="tar -tvf"
 
 PROMPT_COMMAND='echo -en "\033]0;$(whoami)@$(hostname|cut -d "." -f1):$(pwd|sed 's#/home/mago#~#')\a"'
-[[ -x /usr/games/fortune ]] && /usr/games/fortune
 
 
-
+alias tmux="TERM=screen-256color-bce tmux"
