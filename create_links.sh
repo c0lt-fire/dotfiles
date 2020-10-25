@@ -3,7 +3,7 @@
 # you should re-run this script only after a new file has been added under current directory
 
 dir="dotfiles"
-files="bashrc vimrc bash_profile face.icon conkyrc gitconfig"
+files="bashrc vimrc bash_profile face.icon conkyrc gitconfig minimal.bash ctags"
 
 
 #cd $dir

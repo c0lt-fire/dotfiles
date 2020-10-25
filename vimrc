@@ -1,147 +1,176 @@
-
-
 set nocompatible              " be iMproved, required
-
 filetype off                  " required
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
 
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-"Plugin 'python-mode/python-mode'
-"Plugin 'vimwiki/vimwiki'
-Plugin 'tpope/vim-unimpaired'
-Plugin 'godlygeek/tabular'
-Plugin 'plasticboy/vim-markdown'
+call plug#begin('~/.vim/plugged')
+Plug 'godlygeek/tabular'
+Plug 'Yggdroot/indentLine'
+call plug#end()
 
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
+filetype plugin indent on
+syntax on
 
 
-set tabstop=8
-set shiftwidth=4
+set scrolloff=1
+set shiftwidth=4    "Set number of spaces per auto indentation
+set tabstop=4
 set softtabstop=4
 set expandtab
-set smarttab
 set autoindent
-
+set smartindent     "Do smart autoindenting when starting a new line
+set smarttab        "At <Tab> at beginning line inserts spaces set in shiftwidth
+"set mouse=n "enable mouse in normal mode only
+set autoread
 set ignorecase
 set smartcase
+set incsearch
+set nohlsearch
 
-set mouse=""
+set nowrap
 set hidden
-set number
-"set cursorline
-set nocursorline
-set termguicolors
-set history=300
-set cmdheight=2 "The commandbar height
-set ls=2        "always show filename
-set showcmd	" Show (partial) command in status line.
-set showmatch   " Show matching bracets when text indicator is over them
-set mat=2       " How many tenths of a second to blink
-set pumheight=5 " Limit popup menu height 
-"set completeopt=menuone,longest
-set nofoldenable
-set splitbelow
-set splitright
-set linebreak
+set nu
+set laststatus=2
+set statusline=
+set statusline+=\ %F%m%= 
+set statusline+=\ %y
+set statusline+=\ (%{&fileencoding?&fileencoding:&encoding}\,%{&fileformat})
+set statusline+=\ Buf:%2n,col:%2c,%3l\/%L\ %2P
+set showcmd
+set history=100
 
-"set autochdir	" automatically change window's cwd to file's dir
-set autoread 	" Set to auto read when a file is changed from the outside
-set autowrite	" Automatically save before commands like :next and :make
-
-" Turn backup off and undo file
-set nobackup
-set noswapfile
-set noundofile
-
-set wildmenu
-"set wildmode=list:longest,full
-set wildmode=longest:list,full
-
-set wildignorecase
-set wildignore=*.swp,*.bak
-set wildignore+=*.pyc,*.class,*.sln,*.Master,*.csproj,*.csproj.user,*.cache,*.dll,*.pdb,*.min.*
-set wildignore+=*/.git/**/*,*/.hg/**/*,*/.svn/**/*
-set wildignore+=tags
-set wildignore+=*.tar.*
-
-set omnifunc=syntaxcomplete#Complete
-
-set dictionary=/usr/share/dict/words
-" set complete+=k "the word completion will also use dictionary
+" mkdir ~/.vim/.backup ~/.vim/.swp ~/.vim/.undo
+set undodir=~/.vim/.undo//
+set backupdir=~/.vim/.backup//
+set directory=~/.vim/.swp//
 
 set path+=**
 
+set wildmenu
+set wildmode=longest:list,full
+set wildignore=*/build/*,*.o,*.pyc,*.class
+set wildignore+=*/.git/**/*
+set wildignore+=tags,.tags
+set wildignore+=*.tar.*
+"set wildignorecase
+"set complete+=kspell
+
+set pumheight=10
+"set completeopt=menuone,longest
+set tags+=~/.systags
+
+" netrw options
+let g:netrw_banner = 0
+"let g:netrw_browse_split = 4
+
+let $BASH_ENV = "~/.bash_aliases"   "enable bash aliases in vim too
+
+"-------------- AUTO-COMMANDS --------------------------
+
+" save and reload folding
+autocmd BufWinLeave *.* mkview
+autocmd BufWinEnter *.* silent loadview
+
+autocmd Filetype vimrc setlocal omnifunc=syntaxcomplete#Complete
+autocmd BufRead,BufNewFile Makefile* setlocal noexpandtab
+
+" deletes netrw's buffer once it's hidden
+autocmd FileType netrw setl bufhidden=delete 
+
+au BufWritePost *.c,*.cpp,*.h silent! !ctags -R &
+
+"--------- MAPPINGS ------------------------
+nnoremap <silent> <C-L> :nohlsearch<C-R>=has('diff')?'<Bar>diffupdate':''<CR><CR><C-L>
+nnoremap <silent> <F3> :set hlsearch!<CR>
+"nnoremap <silent> <F3> :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls!<CR>
+"map <F4> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+"autocmd FileType c,cpp nnoremap <F5> :silent make %:r \|:redraw!\|cc<CR>
+
+let mapleader=","
+nnoremap    <silent> <Leader>b   :ls<CR>:b<Space>
+nnoremap    <Leader>W   :w !sudo tee % > /dev/null
+
+"--------------------- COMMANDS ----------------------
+command! Tags       !ctags -R .
+command! TagsSystem !~/bin/systags
+command! WikiUpdate !~/git/notes/site_rebuild.sh
+
+"--------------------- FUNCTIONS ----------------------
+function! RunMake()
+  if filereadable("./Makefile") || filereadable("./makefile")
+    silent make
+    cc 
+  elseif (&filetype == "cpp")
+    silent make %:r 
+    redraw!
+    cc
+  endif
+endfunction
+nmap <silent> <F5> :call RunMake()<CR>
+
+function! SwitchSourceHeader()
+  "update!
+  if (expand ("%:e") == "cpp")
+    find %:t:r.h
+  else
+    find %:t:r.cpp
+  endif
+endfunction
+nmap <silent> <F4> :call SwitchSourceHeader()<CR>
+
+"--------------------- UI ----------------------------
+
+" for syntax c.vim and cpp.vim
+let g:cpp_function_highlight = 0
+let g:cpp_member_variable_highlight = 0
+let g:cpp_posix_standard = 1
+
+" for syntax cpp.vim
+let g:cpp_class_scope_highlight = 0
+let g:cpp_class_decl_highlight = 1
+ 
+" for syntax python.vim
+"let g:python_highlight_all=1
+
+let g:PaperColor_Theme_Options = {
+  \   'language': {
+  \     'python': {
+  \       'highlight_builtins' : 1
+  \     },
+  \     'cpp': {
+  \       'highlight_standard_library': 1
+  \     },
+  \     'c': {
+  \       'highlight_builtins' : 1
+  \     }
+  \   }
+  \ }
 
 
-set statusline=
-set statusline+=%<%F                                    "show full file path 
-set statusline+=%m%r%h                                  "modified, read-only, help-file
-set statusline+=%=%y                                    "file type
-set statusline+=[%{strlen(&fenc)?&fenc:'none'},%{&ff}]  "encoding, file-format
-set statusline+=\ %c\ %l/%L\ %P                         "column, line, file length, file percent
+" GNU SCREEN
+" for screen use folowing
+" colorescheme default
+" do not set termguicolors
 
+" TMUX
+" needed for true colors inside tmux
+set t_8f=[38;2;%lu;%lu;%lum
+set t_8b=[48;2;%lu;%lu;%lum
+set termguicolors
 
-nnoremap <C-l> :nohl<CR><C-l>
-nnoremap gb :ls<CR>:b<Space>
-
-nnoremap <leader>f :find *
-nnoremap <leader>s :sfind *
-nnoremap <leader>v :vert sfind *
-nnoremap <leader>t :tabfind *
-
-"Skip entire parts of the project and find files recursively under the directory of the current file:
-nnoremap <leader>F :find <C-R>=expand('%:h').'/*'<CR>
-nnoremap <leader>S :sfind <C-R>=expand('%:h').'/*'<CR>
-nnoremap <leader>V :vert sfind <C-R>=expand('%:h').'/*'<CR>
-nnoremap <leader>T :tabfind <C-R>=expand('%:h').'/*'<CR>
-
-autocmd FileType c nnoremap <F5> :silent make %:r \|:redraw!\|cc<CR>
-
-
-"let g:solarized_termcolors=256
-let python_highlight_all=1
-
-let g:pymode_options_colorcolumn = 0
-let g:pymode_options_max_line_length = 120
-
-let g:vimwiki_list = [{'path': '~/igor/Dropbox/vimwiki',
-                     \'syntax': 'markdown', 'ext': '.md'}]
-
-
-colorscheme desert
-filetype indent plugin on
-syntax enable
+colorscheme PaperColor
 
 if has("gui_running")
-    set lines=50 columns=120
-    set mouse=a
-    colorscheme morning
-    
-    "copy to system clipboard with y only
-    nnoremap y "+y
-    vnoremap y "+y
+    set background=light
+    "colorscheme morning
 
-    nnoremap <C-TAB> :b#<CR>
+    "set cursorline
+    "autocmd WinEnter * setlocal cursorline
+    "autocmd WinLeave * setlocal nocursorline
+    "hi CursorLine guibg=#dadada
+else
+    "colorscheme molokai
+    "highlight Pmenu ctermbg=grey guibg=grey
+    "highlight PmenuSel ctermbg=white guibg=white
+    "highlight LineNr ctermfg=darkgrey ctermbg=none
 endif
 
 
-"Functions
-
-inoremap <silent> <Bar>   <Bar><Esc>:call <SID>align()<CR>a
-
-function! s:align()
-  let p = '^\s*|\s.*\s|\s*$'
-  if exists(':Tabularize') && getline('.') =~# '^\s*|' && (getline(line('.')-1) =~# p || getline(line('.')+1) =~# p)
-    let column = strlen(substitute(getline('.')[0:col('.')],'[^|]','','g'))
-    let position = strlen(matchstr(getline('.')[0:col('.')],'.*|\s*\zs.*'))
-    Tabularize/|/l1
-    normal! 0
-    call search(repeat('[^|]*|',column).'\s\{-\}'.repeat('.',position),'ce',line('.'))
-  endif
-endfunction
